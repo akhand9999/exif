@@ -37,7 +37,6 @@ compiler:
 
 os:
   - linux
-  - osx
 
 matrix:
   include:
@@ -67,6 +66,49 @@ matrix:
           - autopoint
           - clang-6.0
           - libpopt-dev
+
+  - env: CONFIG=normal DIST=bionic
+    os: linux
+    arch: arm64-graviton2
+    virt: lxd
+    group: edge
+    dist: bionic
+    compiler: gcc
+  - env: CONFIG=normal DIST=bionic
+    os: linux
+    arch: arm64-graviton2
+    virt: lxd
+    group: edge
+    dist: bionic
+    compiler: clang
+  - env: CONFIG=normal DIST=focal
+    os: linux
+    arch: arm64-graviton2
+    virt: lxd
+    group: edge
+    dist: focal
+    compiler: gcc
+  - env: CONFIG=normal DIST=focal
+    os: linux
+    arch: arm64-graviton2
+    virt: lxd
+    group: edge
+    dist: focal
+    compiler: clang
+  - env: CONFIG=clang6 DIST=xenial
+    os: linux
+    arch: arm64-graviton2
+    virt: lxd
+    group: edge
+    dist: xenial
+    compiler: clang
+    addons:
+      apt:
+        packages:
+          - autopoint
+          - clang-6.0
+          - libpopt-dev 
+
   - env: CONFIG=clang8 DIST=xenial
     os: linux
     dist: xenial
@@ -138,32 +180,48 @@ matrix:
           - autopoint
           - g++-9
           - libpopt-dev
-  - env: CONFIG=arm-cross
+
+  - env: CONFIG=clang8 DIST=xenial
     os: linux
-    compiler: gcc
-    addons:
-      apt:
-        packages:
-          - autopoint
-          - gcc-4.8-arm-linux-gnueabihf
-          - libc6-dev-armhf-cross
-    cache:
-      directories:
-        - $HOME/popt
-  - env: CONFIG=musl DIST=xenial
-    os: linux
+    arch: arm64-graviton2
+    virt: lxd
+    group: edge
     dist: xenial
-    compiler: gcc
+    compiler: clang
     addons:
       apt:
+        sources:
+          sourceline:
+            - deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-8 main
+          key_url:
+            - https://apt.llvm.org/llvm-snapshot.gpg.key
         packages:
           - autopoint
-          - musl-tools
-    cache:
-      directories:
-        - $HOME/popt
-  - env: CONFIG=sanitize DIST=xenial
+          - clang-8
+          - libpopt-dev
+  - env: CONFIG=clang9 DIST=xenial
     os: linux
+    arch: arm64-graviton2
+    virt: lxd
+    group: edge
+    dist: xenial
+    compiler: clang
+    addons:
+      apt:
+        sources:
+          sourceline:
+            - deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main
+          key_url:
+            - https://apt.llvm.org/llvm-snapshot.gpg.key
+        packages:
+          - autopoint
+          - clang-9
+          - libpopt-dev
+  - env: CONFIG=clang10 DIST=xenial
+    os: linux
+    arch: arm64-graviton2
+    virt: lxd
+    group: edge
     dist: xenial
     compiler: clang
     addons:
@@ -176,42 +234,39 @@ matrix:
         packages:
           - autopoint
           - clang-10
-          - libtool
-    cache:
-      directories:
-        - $HOME/popt
-    # Required for -fsanitize=undefined
-    # see https://github.com/travis-ci/travis-ci/issues/9033
-    sudo: required
-  - env: CONFIG=coverage DIST=xenial
+          - libpopt-dev
+  - env: CONFIG=gcc8 DIST=xenial
     os: linux
+    arch: arm64-graviton2
+    virt: lxd
+    group: edge
     dist: xenial
     compiler: gcc
     addons:
       apt:
+        sources:
+          sourceline:
+            - ppa:ubuntu-toolchain-r/test
         packages:
           - autopoint
+          - g++-8
           - libpopt-dev
-          - subversion
-  - env: CONFIG=normal
-    os: osx
-    osx_image: xcode11
-    compiler: clang
+  - env: CONFIG=gcc9 DIST=xenial
+    os: linux
+    dist: xenial
+    arch: arm64-graviton2
+    virt: lxd
+    group: edge
+    compiler: gcc
     addons:
-      homebrew:
+      apt:
+        sources:
+          sourceline:
+            - ppa:ubuntu-toolchain-r/test
         packages:
-          - popt
-  - env: CONFIG=normal DIST=bionic
-    arch: arm64
-    os: linux
-    dist: bionic
-    compiler: gcc
-  - env: CONFIG=normal DIST=bionic
-    arch: ppc64le
-    os: linux
-    dist: bionic
-    compiler: gcc
-
+          - autopoint
+          - g++-9
+          - libpopt-dev
 before_install:
   # The apt addons section is ignored on bionic for some reason
   - if [ "${DIST}" = "bionic" ] ; then sudo apt-get install -y autopoint gettext libpopt-dev libtool pkg-config; fi
